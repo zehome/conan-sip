@@ -39,7 +39,7 @@ class SIPConan(ConanFile):
                     destdir=os.path.join(self.build_folder, "site-packages"),
                     incdir=os.path.join(self.build_folder, "include"),
                     sipdir=os.path.join(self.build_folder, "sip"),
-                    pyidir=os.path.join(self.build_folder, "site-packages"),
+                    pyidir=os.path.join(self.build_folder, "site-packages", "PyQt5"),
                 ))
             if self.settings.os == "Windows":
                 vcvars = tools.vcvars_command(self.settings)
@@ -50,9 +50,9 @@ class SIPConan(ConanFile):
                 self.run("make install")
 
     def package(self):
-        self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
-        self.copy(pattern="LICENSE-GPL2", dst="licenses", src=self._source_subfolder)
-        self.copy(pattern="LICENSE-GPL3", dst="licenses", src=self._source_subfolder)
+        self.copy("LICENSE", dst="licenses", src=self._source_subfolder)
+        self.copy("LICENSE-GPL2", dst="licenses", src=self._source_subfolder)
+        self.copy("LICENSE-GPL3", dst="licenses", src=self._source_subfolder)
         self.copy("*", src="bin", dst="bin")
         self.copy("*", src="site-packages", dst="site-packages")
         self.copy("*.h", src="include", dst="include")
