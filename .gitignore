@@ -1,0 +1,8 @@
+*.swp
+/bin
+/conanbuildinfo.*
+/conaninfo.*
+/include/
+/package/
+/sip-src/
+/site-packages/
