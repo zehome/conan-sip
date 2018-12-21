@@ -18,6 +18,8 @@ class SIPConan(ConanFile):
     generators = "txt"
     settings = "os", "compiler", "build_type", "arch"
 
+    options = {'shared': [True, False]}
+    default_options = 'shared=True'
     _source_subfolder = "sip-src"
 
     def source(self):
@@ -31,10 +33,11 @@ class SIPConan(ConanFile):
 
     def build(self):
         with tools.chdir(self._source_subfolder):
-            self.run("python configure.py --sip-module={module} "
+            self.run("python configure.py --sip-module={module} {static}"
                 "--bindir={bindir} --destdir={destdir} --incdir={incdir} "
                 "--sipdir={sipdir} --pyidir={pyidir}".format(
                     module="PyQt5.sip",
+                    static="--static " if not self.options.shared else '',
                     bindir=os.path.join(self.build_folder, "bin"),
                     destdir=os.path.join(self.build_folder, "site-packages"),
                     incdir=os.path.join(self.build_folder, "include"),
@@ -54,6 +57,7 @@ class SIPConan(ConanFile):
         self.copy("LICENSE-GPL2", dst="licenses", src=self._source_subfolder)
         self.copy("LICENSE-GPL3", dst="licenses", src=self._source_subfolder)
         self.copy("*", src="bin", dst="bin")
+        self.copy("*", "lib", "lib")
         self.copy("*", src="site-packages", dst="site-packages")
         self.copy("*.h", src="include", dst="include")
 
