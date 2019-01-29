@@ -32,25 +32,32 @@ class SIPConan(ConanFile):
         os.rename(extracted_dir, self._source_subfolder)
 
     def build(self):
+        if self.settings.os == "Windows":
+            PATH = "{0};{1}".format(self.env.get("PYTHON_DIR"), os.environ["PATH"])
+        else:
+            PATH = "{0}:{1}".format(os.path.join(self.env.get("PYTHON_DIR"), "bin"), os.environ["PATH"])
         with tools.chdir(self._source_subfolder):
-            self.run("python configure.py --sip-module={module} {static}"
-                "--bindir={bindir} --destdir={destdir} --incdir={incdir} "
-                "--sipdir={sipdir} --pyidir={pyidir}".format(
-                    module="PyQt5.sip",
-                    static="--static " if not self.options.shared else '',
-                    bindir=os.path.join(self.build_folder, "bin"),
-                    destdir=os.path.join(self.build_folder, "site-packages"),
-                    incdir=os.path.join(self.build_folder, "include"),
-                    sipdir=os.path.join(self.build_folder, "sip"),
-                    pyidir=os.path.join(self.build_folder, "site-packages", "PyQt5"),
-                ))
-            if self.settings.os == "Windows":
-                vcvars = tools.vcvars_command(self.settings)
-                self.run("{0} && nmake".format(vcvars))
-                self.run("{0} && nmake install".format(vcvars))
-            else:
-                self.run("make")
-                self.run("make install")
+            with tools.environment_append({"PATH": PATH}):
+                self.run("python --version")
+                self.run("python configure.py --sip-module={module} {static}"
+                    "--bindir={bindir} --destdir={destdir} --incdir={incdir} "
+                    "--sipdir={sipdir} --pyidir={pyidir}".format(
+                        module="PyQt5.sip",
+                        static="--static " if not self.options.shared else '',
+                        bindir=os.path.join(self.build_folder, "bin"),
+                        destdir=os.path.join(self.build_folder, "site-packages"),
+                        incdir=os.path.join(self.build_folder, "include"),
+                        sipdir=os.path.join(self.build_folder, "sip"),
+                        pyidir=os.path.join(self.build_folder, "site-packages", "PyQt5"),
+                    ),
+                    run_environment=True)
+                if self.settings.os == "Windows":
+                    vcvars = tools.vcvars_command(self.settings)
+                    self.run("{0} && nmake".format(vcvars))
+                    self.run("{0} && nmake install".format(vcvars))
+                else:
+                    self.run("make", run_environment=True)
+                    self.run("make install", run_environment=True)
 
     def package(self):
         self.copy("LICENSE", dst="licenses", src=self._source_subfolder)
@@ -63,4 +70,4 @@ class SIPConan(ConanFile):
 
     def package_info(self):
         self.env_info.path.append(os.path.join(self.package_folder, "bin"))
-        self.env_info.pythonpath.append(os.path.join(self.package_folder, "site-packages"))
+        self.env_info.PYTHONPATH.append(os.path.join(self.package_folder, "site-packages"))
