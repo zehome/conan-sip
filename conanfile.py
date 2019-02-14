@@ -8,7 +8,7 @@ import shutil
 
 class SIPConan(ConanFile):
     name = "sip"
-    version = "4.19.13"
+    version = "4.19.14"
     description = "SIP Python binding for C/C++ (Used by PyQt)"
     topics = ("conan", "python", "binding", "sip")
     url = "https://github.com/zehome/conan-sip"
@@ -23,8 +23,8 @@ class SIPConan(ConanFile):
     _source_subfolder = "sip-src"
 
     def source(self):
-        source_url = "https://sourceforge.net/projects/pyqt/files/sip"
-        tools.get("{0}/sip-{1}/sip-{1}.tar.gz".format(source_url, self.version))
+        source_url = "https://www.riverbankcomputing.com/static/Downloads/sip"
+        tools.get("{0}/sip-{1}.tar.gz".format(source_url, self.version))
         extracted_dir = self.name + "-" + self.version
 
         if os.path.exists(self._source_subfolder):
